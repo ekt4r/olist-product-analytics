@@ -27,3 +27,28 @@ FROM (
 	GROUP BY order_id
 	HAVING COUNT(*) >= 2
 );
+
+WITH order_items_agg AS (
+	SELECT
+		order_id,
+		SUM(price) AS price,
+		SUM(freight_value) AS freight_value
+	FROM public.order_items
+	GROUP BY order_id
+), order_payments_agg AS (
+	SELECT
+		order_id,
+		SUM(payment_value) AS payment_value
+	FROM public.order_payments
+	GROUP BY order_id
+)
+
+SELECT
+	o.order_id,
+	price AS items_total,
+	freight_value AS freight_total,
+	payment_value AS payment_total,
+	payment_value - (price + freight_value) AS payment_diff
+FROM public.orders o
+LEFT JOIN order_items_agg oi ON o.order_id = oi.order_id
+LEFT JOIN order_payments_agg op ON o.order_id = op.order_id;
