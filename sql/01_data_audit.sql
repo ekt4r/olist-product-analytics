@@ -1,0 +1,3 @@
+-- Task 1. Check whether public.orders has one row per order.
+-- Report the total rows, distinct non-NULL order IDs, and rows with NULL IDs.
+-- Explain whether the result indicates missing IDs or duplicate non-NULL IDs.
