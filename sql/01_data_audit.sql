@@ -18,3 +18,12 @@ SELECT
 	COUNT(*) FILTER (WHERE oi.order_id IS NOT NULL AND o.order_id IS NULL) AS items_with_unknown_order_id
 FROM public.order_items oi
 LEFT JOIN public.orders o USING(order_id);
+
+SELECT COUNT(*) AS orders_with_multiple_items
+FROM (
+	SELECT order_id
+	FROM public.order_items
+	WHERE order_id IS NOT NULL
+	GROUP BY order_id
+	HAVING COUNT(*) >= 2
+);
