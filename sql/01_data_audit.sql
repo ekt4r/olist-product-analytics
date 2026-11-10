@@ -52,3 +52,21 @@ SELECT
 FROM public.orders o
 LEFT JOIN order_items_agg oi ON o.order_id = oi.order_id
 LEFT JOIN order_payments_agg op ON o.order_id = op.order_id;
+
+SELECT COUNT(*) AS orders_with_multiple_reviews
+FROM (
+	SELECT
+		order_id
+	FROM public.order_reviews
+	GROUP BY order_id
+	HAVING COUNT(DISTINCT review_id) > 1
+);
+
+SELECT COUNT(*) AS orders_with_multiple_payment_types
+FROM (
+	SELECT
+		order_id
+	FROM public.order_payments
+	GROUP BY order_id
+	HAVING COUNT(DISTINCT payment_type) > 1
+);
