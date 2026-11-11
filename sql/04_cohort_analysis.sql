@@ -36,14 +36,30 @@ WITH customer_cohorts AS (
 		COUNT(*) AS cohort_size
 	FROM customer_cohorts
 	GROUP BY cohort_month
+), cohort_calendar AS (
+	SELECT
+		cs.cohort_month,
+		cs.cohort_size,
+		months.month_start,
+		((EXTRACT(YEAR FROM months.month_start) - EXTRACT(YEAR FROM cohort_month)) * 12
+		+ EXTRACT(MONTH FROM months.month_start) - EXTRACT(MONTH FROM cohort_month))::integer AS months_since_first_purchase
+	FROM cohort_sizes cs
+	CROSS JOIN LATERAL generate_series(
+		cs.cohort_month,
+		TIMESTAMP '2018-08-01',
+		INTERVAL '1 MONTH'
+	) AS months(month_start)
 )
 
 SELECT
-	cma.cohort_month,
-	months_since_first_purchase,
-	active_buyer_count,
+	cc.cohort_month,
+	cc.months_since_first_purchase,
+	COALESCE(active_buyer_count, 0) AS active_buyer_count,
 	cohort_size,
-	ROUND(active_buyer_count * 100.0 / cohort_size, 2) AS active_buyer_pct
-FROM cohort_monthly_activity cma
-LEFT JOIN cohort_sizes cs ON cma.cohort_month = cs.cohort_month
-ORDER BY cma.cohort_month, months_since_first_purchase;
+	ROUND(COALESCE(active_buyer_count, 0) * 100.0 / cc.cohort_size, 2) AS active_buyer_pct
+FROM cohort_calendar cc
+LEFT JOIN cohort_monthly_activity cma ON (
+	cc.cohort_month = cma.cohort_month
+	AND cc.months_since_first_purchase = cma.months_since_first_purchase
+)
+ORDER BY cc.cohort_month, cc.months_since_first_purchase;
