@@ -29,3 +29,18 @@ LEFT JOIN public.mart_orders mo ON oi.order_id = mo.order_id
 WHERE mo.order_status = 'delivered'
 GROUP BY product_category_name
 ORDER BY delivered_items_total DESC;
+
+WITH orders_by_customer AS (
+	SELECT
+		customer_unique_id,
+		COUNT(*) AS delivered_order_count
+	FROM public.mart_orders
+	WHERE order_status = 'delivered' AND customer_unique_id IS NOT NULL
+	GROUP BY customer_unique_id
+)
+
+SELECT
+	COUNT(*) AS buyer_count,
+	COUNT(*) FILTER (WHERE delivered_order_count >= 2) AS repeat_buyer_count,
+	ROUND(COUNT(*) FILTER (WHERE delivered_order_count >= 2) * 100.0 / NULLIF(COUNT(*), 0), 2) AS repeat_buyer_pct
+FROM orders_by_customer;
