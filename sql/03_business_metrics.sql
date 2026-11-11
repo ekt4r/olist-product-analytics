@@ -44,3 +44,12 @@ SELECT
 	COUNT(*) FILTER (WHERE delivered_order_count >= 2) AS repeat_buyer_count,
 	ROUND(COUNT(*) FILTER (WHERE delivered_order_count >= 2) * 100.0 / NULLIF(COUNT(*), 0), 2) AS repeat_buyer_pct
 FROM orders_by_customer;
+
+SELECT
+	DATE_TRUNC('month', order_purchase_timestamp) AS purchase_month,
+	COUNT(*) FILTER (WHERE order_status = 'canceled') AS canceled_order_count,
+	COUNT(*) AS total_order_count,
+	ROUND(COUNT(*) FILTER (WHERE order_status = 'canceled') * 100.0 / COUNT(*), 2) AS canceled_order_pct
+FROM public.mart_orders
+GROUP BY DATE_TRUNC('month', order_purchase_timestamp)
+ORDER BY purchase_month;
