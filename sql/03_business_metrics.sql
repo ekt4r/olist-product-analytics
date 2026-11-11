@@ -53,3 +53,17 @@ SELECT
 FROM public.mart_orders
 GROUP BY DATE_TRUNC('month', order_purchase_timestamp)
 ORDER BY purchase_month;
+
+SELECT
+	DATE_TRUNC('month', order_purchase_timestamp) AS purchase_month,
+	COUNT(*) AS delivered_order_count,
+	COUNT(*) FILTER (WHERE is_delivered_late IS NOT NULL) AS known_lateness_count,
+	COUNT(*) FILTER (WHERE is_delivered_late IS NULL) AS unknown_lateness_count,
+	COUNT(*) FILTER (WHERE is_delivered_late = TRUE) AS delivered_late_count,
+	ROUND(
+		COUNT(*) FILTER (WHERE is_delivered_late = TRUE) * 100.0 /
+		NULLIF(COUNT(*) FILTER (WHERE is_delivered_late IS NOT NULL), 0),
+	2) AS late_order_pct
+FROM public.mart_orders
+WHERE order_status = 'delivered'
+GROUP BY DATE_TRUNC('month', order_purchase_timestamp);
