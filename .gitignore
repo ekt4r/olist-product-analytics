@@ -1,4 +1,5 @@
 /data/raw/
+/data/exports/
 .env
 .env.*
 kaggle.json

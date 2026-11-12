@@ -1,9 +1,11 @@
-# Source data
+# Исходные данные
 
-Download the [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) and extract the nine CSV files into `data/raw/`. Git excludes that directory.
+Скачайте [публичный набор данных Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) и распакуйте девять CSV-файлов в `data/raw/`. Git игнорирует эту папку.
 
 ```sh
 kaggle datasets download -d olistbr/brazilian-ecommerce -p data/raw --unzip
 ```
 
-The existing local PostgreSQL database is `sql_practice`. Its Olist tables are in the `public` schema and use unprefixed names such as `orders`, `order_items`, and `order_payments`. The audit expects these tables to be available before running any queries.
+Для аудита используется отдельная локальная база PostgreSQL `olist_analytics`. Таблицы находятся в схеме `public` и называются без префикса `olist_`, например `orders`, `order_items` и `order_payments`.
+
+В базу загружены исходные CSV. Первичные и внешние ключи можно проверить на этапе аудита.
