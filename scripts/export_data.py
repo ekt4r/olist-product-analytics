@@ -2,8 +2,19 @@ from pathlib import Path
 import pandas as pd
 from sqlalchemy import create_engine, text
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+if not DATABASE_URL:
+    raise ValueError(
+        'Empty DATABASE_URL, copy .env.example to your .env and make a database connection.'
+    )
+
 engine = create_engine(
-    "postgresql+psycopg://ektar@localhost:5432/olist_analytics"
+    DATABASE_URL
 )
 
 with engine.connect() as connection:
