@@ -1,3 +1,4 @@
+-- name: monthly_sales
 -- Считаем все доставленные заказы по месяцу покупки.
 -- Сумма товаров и средний чек учитывают только заказы с известной стоимостью товаров.
 SELECT
@@ -10,6 +11,7 @@ WHERE order_status = 'delivered'
 GROUP BY DATE_TRUNC('month', order_purchase_timestamp)
 ORDER BY purchase_month ASC;
 
+-- name: sales_by_state
 SELECT
 	customer_state,
 	COUNT(*) AS delivered_order_count,
@@ -20,6 +22,7 @@ WHERE order_status = 'delivered'
 GROUP BY customer_state
 ORDER BY delivered_items_total DESC;
 
+-- name: sales_by_category
 SELECT
 	COALESCE(product_category_name, 'Без категории') AS product_category_name,
 	SUM(price) AS delivered_items_total
@@ -30,6 +33,7 @@ WHERE mo.order_status = 'delivered'
 GROUP BY product_category_name
 ORDER BY delivered_items_total DESC;
 
+-- name: repeat_buyers
 WITH orders_by_customer AS (
 	SELECT
 		customer_unique_id,
@@ -45,6 +49,7 @@ SELECT
 	ROUND(COUNT(*) FILTER (WHERE delivered_order_count >= 2) * 100.0 / NULLIF(COUNT(*), 0), 2) AS repeat_buyer_pct
 FROM orders_by_customer;
 
+-- name: monthly_cancellations
 SELECT
 	DATE_TRUNC('month', order_purchase_timestamp) AS purchase_month,
 	COUNT(*) FILTER (WHERE order_status = 'canceled') AS canceled_order_count,
@@ -54,6 +59,7 @@ FROM public.mart_orders
 GROUP BY DATE_TRUNC('month', order_purchase_timestamp)
 ORDER BY purchase_month;
 
+-- name: monthly_delivery
 SELECT
 	DATE_TRUNC('month', order_purchase_timestamp) AS purchase_month,
 	COUNT(*) AS delivered_order_count,
