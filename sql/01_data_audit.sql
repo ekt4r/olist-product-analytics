@@ -26,7 +26,7 @@ FROM (
 	WHERE order_id IS NOT NULL
 	GROUP BY order_id
 	HAVING COUNT(*) >= 2
-);
+) AS multi_item_orders;
 
 WITH order_items_agg AS (
 	SELECT
@@ -60,7 +60,7 @@ FROM (
 	FROM public.order_reviews
 	GROUP BY order_id
 	HAVING COUNT(DISTINCT review_id) > 1
-);
+) AS multi_review_orders;
 
 SELECT COUNT(*) AS orders_with_multiple_payment_types
 FROM (
@@ -69,4 +69,4 @@ FROM (
 	FROM public.order_payments
 	GROUP BY order_id
 	HAVING COUNT(DISTINCT payment_type) > 1
-);
+) AS multi_payment_type_orders;

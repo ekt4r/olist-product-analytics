@@ -24,13 +24,14 @@ ORDER BY delivered_items_total DESC;
 
 -- name: sales_by_category
 SELECT
-	COALESCE(product_category_name, 'Без категории') AS product_category_name,
+	COALESCE(pc.product_category_name_english, p.product_category_name, 'Без категории') AS product_category_name,
 	SUM(price) AS delivered_items_total
 FROM public.order_items oi
 LEFT JOIN public.products p ON oi.product_id = p.product_id
 LEFT JOIN public.mart_orders mo ON oi.order_id = mo.order_id
+LEFT JOIN public.product_category_name_translation pc ON p.product_category_name = pc.product_category_name
 WHERE mo.order_status = 'delivered'
-GROUP BY product_category_name
+GROUP BY COALESCE(pc.product_category_name_english, p.product_category_name, 'Без категории')
 ORDER BY delivered_items_total DESC;
 
 -- name: repeat_buyers
