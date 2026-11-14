@@ -50,17 +50,13 @@ WITH rfm_params AS (
 			customer_unique_id,
 			customer_items_total,
 			CASE
-				WHEN frequency_score = 3 THEN '1. Три и более заказа'
-				WHEN monetary_score >= 2
-				    AND (
-				        frequency_score = 2
-				        OR (frequency_score = 1 AND recency_score = 3)
-				    )
-				THEN '2. Средняя или высокая сумма, два заказа или недавняя покупка'
-				WHEN frequency_score = 2 AND monetary_score = 1 THEN '3. Два заказа, низкая сумма покупок'
-				WHEN frequency_score = 1 AND monetary_score >= 2 THEN '4. Один заказ, средняя или высокая сумма покупок'
-				WHEN frequency_score = 1 AND monetary_score = 1 THEN '5. Один заказ, низкая сумма покупки'
-				ELSE '6. Не классифицирован'
+				WHEN frequency_score = 3 THEN 'Три и более заказа'
+				WHEN frequency_score = 2 AND monetary_score >= 2 THEN 'Два заказа, средняя или высокая сумма'
+				WHEN frequency_score = 1 AND recency_score = 3 AND monetary_score >= 2 THEN 'Один недавний заказ, средняя или высокая сумма'
+				WHEN frequency_score = 2 AND monetary_score = 1 THEN 'Два заказа, низкая сумма покупок'
+				WHEN frequency_score = 1 AND recency_score < 3 AND monetary_score >= 2 THEN 'Один заказ, средняя или высокая сумма, давность выше порога'
+				WHEN frequency_score = 1 AND monetary_score = 1 THEN 'Один заказ, низкая сумма покупки'
+				ELSE 'Не классифицирован'
 			END AS rfm_segment
 		FROM scored_customers
 	)
